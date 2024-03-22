@@ -44,3 +44,66 @@ window.addEventListener('scroll', function () {
         icon.style.transform = `translateY(${scrollPosition * 0.2}px)`;
     });
 });
+
+// ... (existing JavaScript code)
+
+// Live price graph
+const priceCtx = document.getElementById('priceChart').getContext('2d');
+const currentPriceElement = document.getElementById('currentPrice');
+const priceInput = document.getElementById('price');
+
+let currentPrice = 2.50;
+let priceHistory = [];
+
+const priceChart = new Chart(priceCtx, {
+    type: 'line',
+    data: {
+        labels: [],
+        datasets: [{
+            label: 'Beaver Bucks Price',
+            data: [],
+            backgroundColor: 'rgba(255, 215, 0, 0.6)',
+            borderColor: 'rgba(255, 215, 0, 1)',
+            borderWidth: 2,
+            pointRadius: 0,
+            fill: true
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            x: {
+                display: false
+            },
+            y: {
+                beginAtZero: false
+            }
+        },
+        plugins: {
+            legend: {
+                display: false
+            }
+        }
+    }
+});
+
+function updatePrice() {
+    const randomChange = (Math.random() * 0.06) - 0.03; // Random value between -0.03 and 0.03
+    currentPrice += randomChange;
+    currentPrice = Math.max(currentPrice, 0.01); // Ensure price doesn't go below 0.01
+    currentPrice = parseFloat(currentPrice.toFixed(2)); // Round to 2 decimal places
+
+    priceHistory.push(currentPrice);
+    if (priceHistory.length > 100) {
+        priceHistory.shift();
+    }
+
+    currentPriceElement.textContent = currentPrice.toFixed(2);
+    priceInput.value = `$${(currentPrice * parseInt(document.getElementById('amount').value)).toFixed(2)}`;
+
+    priceChart.data.labels = priceHistory.map((_, index) => index + 1);
+    priceChart.data.datasets[0].data = priceHistory;
+    priceChart.update();
+}
+
+setInterval(updatePrice, 1000);
