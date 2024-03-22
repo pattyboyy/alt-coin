@@ -51,6 +51,8 @@ window.addEventListener('scroll', function () {
 const priceCtx = document.getElementById('priceChart').getContext('2d');
 const currentPriceElement = document.getElementById('currentPrice');
 const priceInput = document.getElementById('price');
+const damImage = new Image();
+damImage.src = 'images/dam.webp';
 
 let currentPrice = 2.50;
 let priceHistory = [];
@@ -62,11 +64,26 @@ const priceChart = new Chart(priceCtx, {
         datasets: [{
             label: 'Beaver Bucks Price',
             data: [],
-            backgroundColor: 'rgba(255, 215, 0, 0.6)',
             borderColor: 'rgba(255, 215, 0, 1)',
             borderWidth: 2,
             pointRadius: 0,
-            fill: true
+            fill: true,
+            backgroundColor: function(context) {
+                const chartArea = context.chart.chartArea;
+                if (!chartArea) {
+                    return;
+                }
+                const chartWidth = chartArea.right - chartArea.left;
+                const chartHeight = chartArea.bottom - chartArea.top;
+                const damWidth = damImage.width;
+                const damHeight = damImage.height;
+                const scaleX = chartWidth / damWidth;
+                const scaleY = chartHeight / damHeight;
+
+                const ctx = context.chart.ctx;
+                const pat = ctx.createPattern(damImage, 'repeat');
+                return pat;
+            }
         }]
     },
     options: {
